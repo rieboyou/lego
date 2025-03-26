@@ -1,0 +1,2177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="/css/bootstrap.min.css"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="/css/cropper.min.css"
+      integrity="sha512-6QxSiaKfNSQmmqwqpTNyhHErr+Bbm8u8HHSiinMEz0uimy9nu7lc/2NaXJiUJj2y4BApd5vgDjSHyLzC8nP6Ng=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link href="assets/png/icon-192x192.png" rel="icon" type="image/x-icon" />
+
+    <title>乐高积木艺术画生成程序 > 乐高色号</title>
+
+    <meta property="og:title" content="Lego Art Remix" />
+    <meta property="og:image" content="./assets/png/icon-960x960.png" />
+    <meta property="og:description" content="The Intelligent, Easy to Use Lego Mosaic Maker" />
+    <meta name="description" content="The Intelligent, Easy to Use Lego Mosaic Maker" />
+    <meta name="thumbnail" content="./assets/png/icon-512x512.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#FCE4EC" />
+    <link rel="manifest" href="./manifest.json" />
+	<script src="/js/tongji.js"></script>
+
+    <PageMap>
+      <DataObject type="thumbnail">
+        <Attribute name="src" value="./assets/png/icon-512x512.png" />
+        <Attribute name="width" value="512" />
+        <Attribute name="height" value="512" />
+      </DataObject>
+    </PageMap>
+
+    <style>
+      a {
+        text-decoration: none !important;
+      }
+
+      #responsive-youtube {
+        overflow: hidden;
+        padding-bottom: 56.25%;
+        position: relative;
+        height: 0;
+        font-size: 24px;
+      }
+
+      #responsive-youtube iframe {
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+      }
+
+      .btn-link {
+        text-decoration: none !important;
+        width: 100%;
+        border-width: 0;
+      }
+
+      .paintbrush-controls-button {
+        background-color: #f6f6f6;
+        border: 1px solid rgba(0, 0, 0, 0.125);
+        height: 100%;
+        margin-right: 4px;
+      }
+
+      .paintbrush-controls-button:hover:enabled {
+        background-color: #6c6c6c;
+      }
+
+      #step-3-canvas-upscaled {
+        /* cursor: crosshair; TODO: Better cursor*/
+      }
+
+      .card {
+        background-color: rgba(255, 255, 255, 0.6);
+      }
+
+      .card-header {
+        padding: 0;
+        border: 0;
+      }
+
+      .accordion-card {
+        margin-bottom: 4px;
+      }
+
+      .accordion-card-body {
+        padding: 4px;
+      }
+
+      h4 {
+        line-height: 20px;
+        margin-bottom: 0;
+      }
+
+      step-header-subtitle {
+        margin-left: 2px;
+      }
+
+      #nonzero-missing-pieces-warning {
+        color: #dc3545;
+      }
+
+      .checkbox-clickable {
+        cursor: pointer;
+      }
+
+      table {
+        border-top: 1px solid rgb(222, 226, 230);
+        border-left: 1px solid rgb(222, 226, 230);
+        border-bottom: 0;
+        border-right: 0;
+      }
+
+      td,
+      th {
+        border-top: 0;
+        border-left: 0;
+        border-bottom: 1px solid rgb(222, 226, 230);
+        border-right: 1px solid rgb(222, 226, 230);
+      }
+
+      .piece-count-infinity-placeholder {
+        padding-left: 2px;
+        padding-right: 2px;
+        font-weight: 600;
+        font-size: 18px;
+      }
+
+      .cropper-img {
+        display: block;
+
+        max-width: 100%;
+      }
+
+      .progress-bar.indeterminate {
+        position: relative;
+        animation: progress-indeterminate 3s linear infinite;
+      }
+
+      @keyframes progress-indeterminate {
+        from {
+          left: -50%;
+          width: 50%;
+        }
+
+        to {
+          left: 100%;
+          width: 50%;
+        }
+      }
+
+      footer {
+        bottom: 0;
+        width: 100%;
+      }
+
+      .footer {
+        height: 50px;
+        text-align: center;
+      }
+    </style>
+
+    <style class="dark-mode-stylesheet" disabled>
+      html,
+      body {
+        background-color: black;
+      }
+
+      html,
+      body,
+      .table,
+      .btn-outline-dark {
+        color: #d3d3d3;
+      }
+
+      .btn {
+        color: #ffffff;
+      }
+
+      .paintbrush-controls-button {
+        background-color: #1c1c1c;
+      }
+
+      .btn-warning,
+      .dropdown-item {
+        color: #212529;
+      }
+
+      .card {
+        background-color: rgb(33, 33, 33, 0.6);
+      }
+
+      .nav-tabs .nav-item.show .nav-link,
+      .nav-tabs .nav-link.active {
+        background-color: rgb(33, 33, 33, 0.6);
+        border-color: rgb(50, 50, 50);
+      }
+
+      .nav-tabs {
+        border-bottom: 0;
+      }
+
+      table {
+        border-top: 1px solid rgb(50, 50, 50);
+        border-left: 1px solid rgb(50, 50, 50);
+      }
+
+      td,
+      th {
+        border-bottom: 1px solid rgb(50, 50, 50);
+        border-right: 1px solid rgb(50, 50, 50);
+      }
+
+      .table thead th {
+        border-bottom: 1px solid rgb(50, 50, 50);
+        border-top: 1px solid rgb(50, 50, 50);
+      }
+    </style>
+  </head>
+
+  <body>
+    <div style="margin: 10px; padding-bottom: 30px; overflow: hidden; min-height: calc(100vh - 100px)">
+      <h2 style="margin-bottom: 0; text-align:center;"><a href="./">万砖积木-艺术画程序</a> > 乐高色号</h2>
+      <div style="margin-bottom: 10px; margin-left: 6px">
+        <small>按照设定的色表/套装自动把图片转换成积木艺术画，并生成PDF步骤图和提供文件下载。</small>
+        <div style="margin-bottom: 5px">
+          <small>
+            <span>Made with ♥ by Deb</span> &bull;  感谢Deb的贡献。我们在此基础上对程序进行了界面汉化，功能还是原汁原味的。
+          </small>
+        </div>
+      </div>
+      <canvas id="background-image-cache-canvas" hidden></canvas>
+
+      <div>
+        <div class="progress" style="height: 8px; margin-bottom: 2px" id="universal-loading-progress">
+          <div class="progress-bar indeterminate style=" height:10px"">
+        </div>
+      </div>
+      <div style="height: 8px; margin-bottom: 2px" id="universal-loading-progress-complement" hidden></div>
+    </div>
+
+    <div class="row" id="steps-row" hidden>
+      <div id="step-1" class="col-md-3 hide-on-step-3-expansion">
+        <div class="card" style="padding: 10px; margin-bottom: 10px">
+          <ul class="nav nav-tabs 3d-selector-tabs" role="tablist" hidden>
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                id="step-1-color-tab"
+                data-toggle="tab"
+                href="#step-1-color-tab-content"
+                role="tab"
+                aria-controls="step-1-color-tab-content"
+                aria-selected="true"
+                >颜色</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                id="step-1-depth-tab"
+                data-toggle="tab"
+                href="#step-1-depth-tab-content"
+                role="tab"
+                aria-controls="step-1-color-depth-content"
+                aria-selected="false"
+                >深度</a
+              >
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div
+              class="tab-pane fade show active"
+              id="step-1-color-tab-content"
+              role="tabpanel"
+              aria-labelledby="step-1-color-tab"
+            >
+              <div style="width: 100%">
+                <canvas id="step-1-canvas-upscaled" style="width: 100%" class="cropper-img"></canvas>
+              </div>
+              <h4>步骤 1</h4>
+              <small className="step-header-subtitle">裁剪、缩放或使用新图片</small>
+              <div id="step-1-accordion">
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-1-1-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-1-1-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-1-1-collapse"
+                      >
+                        积木画像素点选择
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-1-1-collapse"
+                    class="collapse"
+                    aria-labelledby="step-1-1-heading"
+                    data-parent="#step-1-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <b>目标像素点（分辨率）：</b>
+                      <div style="width: 100%">
+                        <div>
+                          宽度：
+                          <span id="width-text" data-toggle="tooltip" title="" data-placement="top">48</span> 点
+                        </div>
+                        <input
+                          type="range"
+                          id="width-slider"
+                          name="points"
+                          min="16"
+                          max="128"
+                          step="16"
+                          value="48"
+                          style="width: 100%"
+                        />
+                      </div>
+                      <div style="width: 100%">
+                        <div>
+                          高度：
+                          <span id="height-text" data-toggle="tooltip" title="" data-placement="top">48</span> 点
+                        </div>
+                        <input
+                          type="range"
+                          id="height-slider"
+                          name="points"
+                          min="16"
+                          max="128"
+                          step="16"
+                          value="48"
+                          style="width: 100%"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card accordion-card" id="enable-depth-button-container">
+                  <div class="card-header" id="step-1-2-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-1-2-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-1-2-collapse"
+                      >
+                        3D设置（基本是用不上的）
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-1-2-collapse"
+                    class="collapse"
+                    aria-labelledby="step-1-2-heading"
+                    data-parent="#step-1-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <button class="btn btn-info" type="button" id="enable-depth-button" style="margin-top: 8px">
+                        启用 3D
+                      </button>
+                      <small>
+                        <div>
+                          <p style="margin-top: 4px; margin-left: 4px; margin-bottom: 8px">
+                            启用3D模式允许设计具有多层的图片，其中一些像素比其他像素突出得更远。
+                          </p>
+                          <p style="margin-top: 4px; margin-left: 4px; margin-bottom: 8px">
+                            这可能不适合所有图像，但在许多情况下都可以很好地工作。
+                          </p>
+                        </div>
+                      </small>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-1-3-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-1-3-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-1-3-collapse"
+                      >
+                        使用新图片
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-1-3-collapse"
+                    class="collapse"
+                    aria-labelledby="step-1-3-heading"
+                    data-parent="#step-1-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <div id="image-input-new"></div>
+                      <small>
+                        <p style="margin-left: 4px; margin-top: 4px">
+                          支持的图像格式取决于浏览器的兼容性。
+                        </p>
+                        <p style="margin-bottom: 0; margin-left: 4px">
+                          不完全支持具有透明度的图像。
+                        </p>
+                      </small>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-1-4-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-1-4-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-1-4-collapse"
+                      >
+                        增大像素点限制
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-1-4-collapse"
+                    class="collapse"
+                    aria-labelledby="step-1-4-heading"
+                    data-parent="#step-1-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <button
+                        class="btn btn-warning"
+                        type="button"
+                        id="resolution-limit-increase-button"
+                        style="margin-bottom: 12px; margin-top: 8px"
+                      >
+                        点我增大像素点限制
+                      </button>
+                      <small>
+                        <div>
+                          <b style="color: #ff4c00">重要提示</b>
+                          <p>把像素点从128*128提高到256*256，长宽尺寸翻倍。</br>最大尺寸是2.048（宽）*2.048（高）米。</p>
+                          <p>像素点越多就越消耗本地计算机的资源（也就是越卡机），需要慢慢等待程序处理，尤其是在生成高清pdf步骤图文件和3D预览时。</p>
+                        </div>
+                      </small>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="tab-pane fade"
+              id="step-1-depth-tab-content"
+              role="tabpanel"
+              aria-labelledby="step-1-depth-tab-content"
+            >
+              <canvas id="web-worker-input-canvas" hidden></canvas>
+              <canvas id="web-worker-output-canvas" hidden></canvas>
+              <canvas id="step-1-depth-canvas" hidden></canvas>
+              <canvas id="step-1-depth-canvas-upscaled" style="width: 100%"></canvas>
+              <h4>步骤 1</h4>
+              <small className="step-header-subtitle">获取深度图</small><br />
+              <small className="step-header-subtitle">深度图裁剪将匹配输入图像</small>
+              <div id="step-1-depth-accordion">
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-1-depth-1-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-1-depth-1-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-1-depth-1-collapse"
+                      >
+                        选择
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-1-depth-1-collapse"
+                    class="collapse"
+                    aria-labelledby="step-1-depth-1-heading"
+                    data-parent="#step-1-depth-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <input
+                        type="file"
+                        id="input-depth-image-selector-hidden"
+                        name="input-depth-image-selector-hidden"
+                        hidden
+                      />
+                      <button
+                        class="btn btn-success"
+                        type="button"
+                        id="input-depth-image-selector"
+                        style="margin-top: 8px"
+                      >
+                        选择深度贴图图像
+                      </button>
+                      <br />
+                      <small
+                        >如果您有与图像对应的深度图，则可以在此处选择。如果没有，可以在“生成”部分生成近似值。
+                      </small>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-1-depth-2-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-1-depth-2-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-1-depth-2-collapse"
+                      >
+                        生成
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-1-depth-2-collapse"
+                    class="collapse"
+                    aria-labelledby="step-1-depth-2-heading"
+                    data-parent="#step-1-depth-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <button class="btn btn-success" type="button" id="generate-depth-image" style="margin-top: 8px">
+                        使用DNN计算
+                      </button>
+                      <br />
+                      <small>如果没有深度图，这将计算深度图的近似值。</small>
+                      <h5 style="margin-top: 4px" id="web-worker-loading-message" hidden></h5>
+                      <div>
+                        <small>
+                          <b style="color: #ff4c00">重要提示</b>
+                          <br />
+                          <p>计算深度图在计算上可能需要占用大量资源。请耐心等待一段时间。</p>
+                          <b>这是如何工作的？</b>
+                          <p>
+                            使用DNN（深度神经网络）计算深度图。出于“关于”部分所述的原因，所有内容都完全在浏览器中运行，使用的是
+                            <a href="https://github.com/microsoft/onnxjs" target="_blank">ONNX.js</a>. 使用的模型是
+                            <a href="https://github.com/intel-isl/MiDaS" target="_blank">MiDaS</a>
+                            - 更具体地说，可以找到的小型ONNX版本
+                            <a href="https://github.com/intel-isl/MiDaS/releases/tag/v2_1" target="_blank">在这里</a>.
+                          </p>
+                          <div class="card" style="margin-top: 4px; margin-bottom: 16px; padding: 2px">
+                            <b>所用模型的引用</b>
+                            <span>
+                              兰夫特、勒内、卡特琳&#183;拉辛格、戴维&#183;哈夫纳、康拉德&#183;辛德勒和弗拉德伦&#183;科尔顿。“走向稳健的单目深度估计：混合数据集进行零炮交叉数据集传输。”（2020年）。<i>IEEE模式分析和机器智能交易</i></span
+                            >
+                          </div>
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="step-2" class="col-md-3 hide-on-step-3-expansion">
+        <div class="card" style="padding: 10px; margin-bottom: 10px">
+          <ul class="nav nav-tabs 3d-selector-tabs" role="tablist" hidden>
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                id="step-2-color-tab"
+                data-toggle="tab"
+                href="#step-2-color-tab-content"
+                role="tab"
+                aria-controls="step-1-color-tab-content"
+                aria-selected="true"
+                >颜色</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                id="step-2-depth-tab"
+                data-toggle="tab"
+                href="#step-2-depth-tab-content"
+                role="tab"
+                aria-controls="step-1-color-depth-content"
+                aria-selected="false"
+                >深度</a
+              >
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div
+              class="tab-pane fade show active"
+              id="step-2-color-tab-content"
+              role="tabpanel"
+              aria-labelledby="step-2-color-tab"
+            >
+              <canvas id="step-2-canvas" hidden></canvas>
+              <canvas id="step-2-canvas-upscaled" style="width: 100%"></canvas>
+              <h4>步骤 2</h4>
+              <small className="step-header-subtitle">调整图片颜色</small>
+
+              <div id="step-2-accordion">
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-2-4-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-2-4-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-2-4-collapse"
+                      >
+                        像素化算法
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-2-4-collapse"
+                    class="collapse"
+                    aria-labelledby="step-2-4-heading"
+                    data-parent="#step-2-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <div style="width: 100%">
+                        <div style="margin-top: 12px; margin-left: 4px" id="color-ties-resolution-section">
+                          <small>
+                            <p style="margin-bottom: 4px">
+                              此设置确定使用哪种算法将图像调整为目标分辨率。
+                            </p>
+                          </small>
+                        </div>
+                        <div class="btn-group">
+                          <button
+                            class="btn dropdown-toggle btn-outline-dark"
+                            type="button"
+                            id="interpolation-algorithm-button"
+                            data-toggle="dropdown"
+                          >
+                            浏览器默认值
+                          </button>
+                          <div class="dropdown-menu" id="interpolation-algorithm-options"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-2-1-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-2-1-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-2-1-collapse"
+                      >
+                        HSV调整
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-2-1-collapse"
+                    class="collapse"
+                    aria-labelledby="step-2-1-heading"
+                    data-parent="#step-2-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <div style="width: 100%">
+                        <div>
+                          色调调整：
+                          <span id="hue-text">0<span>&#176;</span></span>
+                        </div>
+                        <div style="display: flex; direction: horizontal; width: 100%; margin-bottom: 8px">
+                          <button class="btn btn-sm" id="hue-decrement" style="flex-grow: 0">-</button>
+                          <input
+                            type="range"
+                            id="hue-slider"
+                            name="points"
+                            min="-180"
+                            max="180"
+                            style="flex-grow: 1; min-width: 10px"
+                          />
+                          <button class="btn btn-sm" id="hue-increment" style="flex-grow: 0">+</button>
+                        </div>
+                      </div>
+                      <div style="width: 100%">
+                        <div>
+                          饱和度调整：
+                          <span id="saturation-text">0%</span>
+                        </div>
+                        <div style="display: flex; direction: horizontal; width: 100%; margin-bottom: 8px">
+                          <button class="btn btn-sm" id="saturation-decrement" style="flex-grow: 0">-</button>
+                          <input
+                            type="range"
+                            id="saturation-slider"
+                            name="points"
+                            min="-100"
+                            max="100"
+                            style="flex-grow: 1; min-width: 10px"
+                          />
+                          <button class="btn btn-sm" id="saturation-increment" style="flex-grow: 0">+</button>
+                        </div>
+                      </div>
+                      <div style="width: 100%">
+                        <div>
+                          明度调整：
+                          <span id="value-text">0%</span>
+                        </div>
+                        <div style="display: flex; direction: horizontal; width: 100%; margin-bottom: 8px">
+                          <button class="btn btn-sm" id="value-decrement" style="flex-grow: 0">-</button>
+                          <input
+                            type="range"
+                            id="value-slider"
+                            name="points"
+                            min="-100"
+                            max="100"
+                            style="flex-grow: 1; min-width: 10px"
+                          />
+                          <button class="btn btn-sm" id="value-increment" style="flex-grow: 0">+</button>
+                        </div>
+                      </div>
+                      <button class="btn btn-info" type="button" id="reset-hsv-button">重置 HSV</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-2-2-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-2-2-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-2-2-collapse"
+                      >
+                        亮度
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-2-2-collapse"
+                    class="collapse"
+                    aria-labelledby="step-2-2-heading"
+                    data-parent="#step-2-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <div style="width: 100%">
+                        <div>
+                          亮度调整：
+                          <span id="brightness-text">0</span>
+                        </div>
+                        <div style="display: flex; direction: horizontal; width: 100%; margin-bottom: 8px">
+                          <button class="btn btn-sm" id="brightness-decrement" style="flex-grow: 0">-</button>
+                          <input
+                            type="range"
+                            id="brightness-slider"
+                            name="points"
+                            min="-128"
+                            max="128"
+                            style="flex-grow: 1; min-width: 10px"
+                          />
+                          <button class="btn btn-sm" id="brightness-increment" style="flex-grow: 0">+</button>
+                        </div>
+                      </div>
+                      <button class="btn btn-info" type="button" id="reset-brightness-button">重置 亮度</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-2-3-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-2-3-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-2-3-collapse"
+                      >
+                        对比度
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-2-3-collapse"
+                    class="collapse"
+                    aria-labelledby="step-2-3-heading"
+                    data-parent="#step-2-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <div style="width: 100%">
+                        <div>
+                          对比度调整：
+                          <span id="contrast-text">0</span>
+                        </div>
+                        <div style="display: flex; direction: horizontal; width: 100%; margin-bottom: 8px">
+                          <button class="btn btn-sm" id="contrast-decrement" style="flex-grow: 0">-</button>
+                          <input
+                            type="range"
+                            id="contrast-slider"
+                            name="points"
+                            min="-128"
+                            max="128"
+                            style="flex-grow: 1; min-width: 10px"
+                          />
+                          <button class="btn btn-sm" id="contrast-increment" style="flex-grow: 0">+</button>
+                        </div>
+                      </div>
+                      <button class="btn btn-info" type="button" id="reset-contrast-button">重置 对比度</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="tab-pane fade"
+              id="step-2-depth-tab-content"
+              role="tabpanel"
+              aria-labelledby="step-2-depth-tab-content"
+            >
+              <canvas id="step-2-depth-canvas-cropper-buffer" hidden></canvas>
+              <canvas id="step-2-depth-canvas" hidden></canvas>
+              <canvas id="step-2-depth-canvas-upscaled" style="width: 100%"></canvas>
+              <h4>步骤 2</h4>
+              <small className="step-header-subtitle">使深度离散</small>
+              <div id="step-2-depth-accordion">
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-2-depth-1-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-2-depth-1-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-2-depth-1-collapse"
+                      >
+                        水平计数
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-2-depth-1-collapse"
+                    class="collapse"
+                    aria-labelledby="step-2-depth-1-heading"
+                    data-parent="#step-2-depth-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <div style="width: 100%">
+                        <div>
+                          <b>深度层的数量：<span id="num-depth-levels-text">3</span></b>
+                        </div>
+                        <div>
+                          <small
+                            >确定您希望图像像素具有多少离散深度级别，其中每个级别为一个积木板深度。</small
+                          >
+                        </div>
+                        <input
+                          type="range"
+                          id="num-depth-levels-slider"
+                          name="num-depth-levels-slider"
+                          min="2"
+                          max="4"
+                          style="width: 100%"
+                          value="3"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-2-depth-2-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-2-depth-2-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-2-depth-2-collapse"
+                      >
+                        阈值
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-2-depth-2-collapse"
+                    class="collapse"
+                    aria-labelledby="step-2-depth-2-heading"
+                    data-parent="#step-2-depth-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <div style="width: 100%">
+                        <div>
+                          <b>深度阈值<span class="threshold-plural-s" hidden>s</span></b>
+                        </div>
+                        <div>
+                          <small
+                            >调整阈值<span class="threshold-plural-s" hidden>s</span> 用于分离离散深度级别。</small
+                          >
+                        </div>
+                        <div id="depth-threshold-sliders-containers">
+                          <input type="range" min="0" max="255" style="width: 100%" value="128" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-2-depth-3-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-2-depth-3-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-2-depth-3-collapse"
+                      >
+                        故障排除
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-2-depth-3-collapse"
+                    class="collapse"
+                    aria-labelledby="step-2-depth-3-heading"
+                    data-parent="#step-2-depth-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <small
+                        >如果离散化深度图为空，请确保在步骤1中选择或计算了深度图，并调整阈值<span class="threshold-plural-s" hidden>s</span> 因此，它们位于要分离的图像部分之间。</small
+                      >
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="step-3" class="col-md-3">
+        <div class="card" style="padding: 10px; margin-bottom: 10px">
+          <ul class="nav nav-tabs 3d-selector-tabs" role="tablist" hidden>
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                id="step-3-color-tab"
+                data-toggle="tab"
+                href="#step-3-color-tab-content"
+                role="tab"
+                aria-controls="step-1-color-tab-content"
+                aria-selected="true"
+                >颜色</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                id="step-3-depth-tab"
+                data-toggle="tab"
+                href="#step-3-depth-tab-content"
+                role="tab"
+                aria-controls="step-1-color-depth-content"
+                aria-selected="false"
+                >深度</a
+              >
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div
+              class="tab-pane fade show active"
+              id="step-3-color-tab-content"
+              role="tabpanel"
+              aria-labelledby="step-3-color-tab"
+            >
+              <canvas id="step-3-canvas" hidden></canvas>
+              <canvas id="step-3-canvas-upscaled" style="width: 100%"></canvas>
+              <h4>步骤 3</h4>
+              <small className="step-header-subtitle">匹配与所用到的颜色，可在下方调整颜色。</small>
+              <br />
+              <span
+                data-toggle="tooltip"
+                title="这是平均每像素量化误差。该值越低，该图像越接近步骤2中的图像（根据所选颜色距离函数）"
+                data-placement="top"
+              >
+                <small>平均值</small> &#x3F5;:
+                <small id="step-3-quantization-error"></small>
+              </span>
+
+              <div style="display: flex; flex-direction: row; flex-wrap: wrap">
+                <div style="margin-bottom: 4px">
+                  <div class="btn-group">
+                    <button
+                      class="btn dropdown-toggle paintbrush-controls-button"
+                      type="button"
+                      id="paintbrush-tool-selection-dropdown"
+                      data-toggle="dropdown"
+                      aria-haspopup="true"
+                      aria-expanded="false"
+                    >
+                      <svg width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                        <path
+                          d="M15.825.12a.5.5 0 0 1 .132.584c-1.53 3.43-4.743 8.17-7.095 10.64a6.067 6.067 0 0 1-2.373 1.534c-.018.227-.06.538-.16.868-.201.659-.667 1.479-1.708 1.74a8.118 8.118 0 0 1-3.078.132 3.659 3.659 0 0 1-.562-.135 1.382 1.382 0 0 1-.466-.247.714.714 0 0 1-.204-.288.622.622 0 0 1 .004-.443c.095-.245.316-.38.461-.452.394-.197.625-.453.867-.826.095-.144.184-.297.287-.472l.117-.198c.151-.255.326-.54.546-.848.528-.739 1.201-.925 1.746-.896.126.007.243.025.348.048.062-.172.142-.38.238-.608.261-.619.658-1.419 1.187-2.069 2.176-2.67 6.18-6.206 9.117-8.104a.5.5 0 0 1 .596.04z"
+                        />
+                      </svg>
+                    </button>
+                    <div
+                      class="dropdown-menu"
+                      id="paintbrush-tool-selection-dropdown-options"
+                      aria-labelledby="paintbrush-tool-selection-dropdown"
+                    >
+                      <a class="dropdown-item btn" id="paintbrush-tool-dropdown-option">
+                        <span>
+                          <svg width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                            <path
+                              d="M15.825.12a.5.5 0 0 1 .132.584c-1.53 3.43-4.743 8.17-7.095 10.64a6.067 6.067 0 0 1-2.373 1.534c-.018.227-.06.538-.16.868-.201.659-.667 1.479-1.708 1.74a8.118 8.118 0 0 1-3.078.132 3.659 3.659 0 0 1-.562-.135 1.382 1.382 0 0 1-.466-.247.714.714 0 0 1-.204-.288.622.622 0 0 1 .004-.443c.095-.245.316-.38.461-.452.394-.197.625-.453.867-.826.095-.144.184-.297.287-.472l.117-.198c.151-.255.326-.54.546-.848.528-.739 1.201-.925 1.746-.896.126.007.243.025.348.048.062-.172.142-.38.238-.608.261-.619.658-1.419 1.187-2.069 2.176-2.67 6.18-6.206 9.117-8.104a.5.5 0 0 1 .596.04z"
+                            />
+                          </svg>
+                        </span>
+                        画笔
+                      </a>
+                      <a class="dropdown-item btn" id="eraser-tool-dropdown-option">
+                        <span>
+                          <svg width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                            <path
+                              d="M8.086 2.207a2 2 0 0 1 2.828 0l3.879 3.879a2 2 0 0 1 0 2.828l-5.5 5.5A2 2 0 0 1 7.879 15H5.12a2 2 0 0 1-1.414-.586l-2.5-2.5a2 2 0 0 1 0-2.828l6.879-6.879zm.66 11.34L3.453 8.254 1.914 9.793a1 1 0 0 0 0 1.414l2.5 2.5a1 1 0 0 0 .707.293H7.88a1 1 0 0 0 .707-.293l.16-.16z"
+                            />
+                          </svg>
+                        </span>
+                        橡皮擦
+                      </a>
+                      <a class="dropdown-item btn" id="dropdown-tool-dropdown-option">
+                        <span>
+                          <svg width="16" height="16" fill="currentColor" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                            <path
+                              d="M13.354.646a1.207 1.207 0 0 0-1.708 0L8.5 3.793l-.646-.647a.5.5 0 1 0-.708.708L8.293 5l-7.147 7.146A.5.5 0 0 0 1 12.5v1.793l-.854.853a.5.5 0 1 0 .708.707L1.707 15H3.5a.5.5 0 0 0 .354-.146L11 7.707l1.146 1.147a.5.5 0 0 0 .708-.708l-.647-.646 3.147-3.146a1.207 1.207 0 0 0 0-1.708l-2-2zM2 12.707l7-7L10.293 7l-7 7H2v-1.293z"
+                            />
+                          </svg>
+                        </span>
+                        吸管
+                      </a>
+                    </div>
+                  </div>
+                </div>
+                <span id="paintbrush-controls" style="margin-bottom: 4px"> </span>
+                <div style="margin-bottom: 4px">
+                  <button
+                    class="btn paintbrush-controls-button"
+                    type="button"
+                    id="clear-overrides-button"
+                    data-toggle="tooltip"
+                    title="擦除所有画笔更改"
+                    data-placement="top"
+                  >
+                    <svg width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                      <path
+                        d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <div style="margin-bottom: 4px">
+                  <button
+                    class="btn paintbrush-controls-button"
+                    type="button"
+                    id="toggle-expansion-button"
+                    data-toggle="tooltip"
+                    title="展开图片"
+                    data-placement="top"
+                  >
+                    <div id="expand-picture-svg">
+                      <svg
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        class="bi bi-arrows-fullscreen"
+                        viewBox="0 0 16 16"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707z"
+                        />
+                      </svg>
+                    </div>
+                    <div id="collapse-picture-svg" hidden>
+                      <svg
+                        width="16"
+                        height="16"
+                        fill="currentColor"
+                        class="bi bi-arrows-fullscreen"
+                        viewBox="0 0 16 16"
+                      >
+                        <path
+                          fill-rule="evenodd"
+                          d="M.172 15.828a.5.5 0 0 0 .707 0l4.096-4.096V14.5a.5.5 0 1 0 1 0v-3.975a.5.5 0 0 0-.5-.5H1.5a.5.5 0 0 0 0 1h2.768L.172 15.121a.5.5 0 0 0 0 .707zM15.828.172a.5.5 0 0 0-.707 0l-4.096 4.096V1.5a.5.5 0 1 0-1 0v3.975a.5.5 0 0 0 .5.5H14.5a.5.5 0 0 0 0-1h-2.768L15.828.879a.5.5 0 0 0 0-.707z"
+                        />
+                      </svg>
+                    </div>
+                  </button>
+                </div>
+              </div>
+              <div id="step-3-accordion">
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-3-2-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-3-2-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-3-2-collapse"
+                      >
+                        所用到颜色
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-3-2-collapse"
+                    class="collapse"
+                    aria-labelledby="step-3-2-heading"
+                    data-parent="#step-3-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <div id="custom-stud-map-controls" style="margin-top: 4px">
+                        <div style="margin-bottom: 20px">
+                          <small>
+                            <p style="margin-left: 4px; margin-bottom: 8px">
+                              &#9679;  调整指定可用于创建图像的每种颜色和数量。
+                            </p>
+                            <p style="margin-left: 4px; margin-bottom: 8px">&#9679; 颜色名称是砖颜色。</p>
+                            <p style="margin-left: 4px; margin-bottom: 8px">
+                              &#9679; 除非选择足够的数量来填充图片，否则无法运行算法的步骤4（“缺失数量”必须为0）。
+                            </p>
+                            <p style="margin-left: 4px; margin-bottom: 8px">
+                              &#9679; 如果使用现有的套装内的数量，可用先“清除所有颜色”，并使用“混合”选项添加需要的套装。
+                            </p>
+                            <b>所需数量：<span id="required-studs"></span></b><br>
+                            <b>可用数量：<span id="available-studs"></span></b><br>
+                            <b>缺失数量：<span id="missing-studs"></span></b><br>
+                          </small>
+                        </div>
+                        <div style="padding-bottom: 10px">
+                          <button class="btn btn-warning" type="button" id="clear-custom-studs-button">
+                            清除所有颜色
+                          </button>
+                        </div>
+                        <div
+                          class="checkbox"
+                          style="margin-top: 4px; margin-left: 4px"
+                          id="infinite-piece-count-check-container"
+                        >
+                          <label class="checkbox-clickable">
+                            <input type="checkbox" class="checkbox-clickable" id="infinite-piece-count-check" />
+                            <span style="font-size: 13px">设定所使用颜色的数量为无限</span>
+                          </label>
+                        </div>
+                        <div style="margin-left: 4px" id="forced-infinite-piece-count-warning" hidden>
+                          <small>
+                            <p>
+                              <b>重要的</b>：由于在
+                              <span style="font-weight: 550">'量化'</span>
+                              节，或在
+                              <span style="font-weight: 550">“像素块”</span>
+                              部分
+                            </p>
+                          </small>
+                        </div>
+                        <div style="margin-left: 4px">
+                          <small>
+                            <p>
+                              <b>注意</b>：启用无限件数时，启用数量无限时，假设在使用画笔绘制的任何颜色都可出现。
+                            </p>
+                          </small>
+                        </div>
+                        <table class="table">
+                          <thead>
+                            <tr>
+                              <th scope="col">颜色</th>
+                              <th scope="col">可用数量</th>
+                            </tr>
+                          </thead>
+                          <tbody id="custom-stud-table-body"></tbody>
+                        </table>
+                        <div style="padding-bottom: 10px">
+                          <button class="btn btn-success" id="add-custom-stud-button">
+                            <span class="glyphicon glyphicon-plus"></span>+ 添加颜色
+                          </button>
+                        </div>
+                        <div style="padding-bottom: 10px">
+                          <a id="export-stud-map-button" download="selected-studs.json" href="””">
+                            <button class="btn btn-info" type="button">导出当前颜色</button>
+                          </a>
+                        </div>
+                        <div class="btn-group">
+                          <button
+                            class="btn dropdown-toggle btn-info"
+                            type="button"
+                            id="mix-in-stud-map-button"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                          >
+                            导入套装颜色
+                          </button>
+                          <div
+                            class="dropdown-menu"
+                            id="mix-in-stud-map-options"
+                            aria-labelledby="mix-in-stud-map-button"
+                          ></div>
+                          <input type="file" id="import-stud-map-file-input" name="import-stud-map-file-input" hidden />
+                        </div>
+                        <div style="margin-left: 4px">
+                          <small><b>“导入颜色”将叠加到已选择的颜色中。</b></small>
+                        </div>
+						<div style="margin-left: 4px">
+                          <small><b>或者清除所有颜色后再“导入颜色”。</b></small>
+                        </div>
+                        <div style="margin-left: 4px; padding-top: 4px">
+                          <small>
+                            <b>确保在颜色中混合的集合与选定的像素块匹配。</b></small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card accordion-card hide-on-step-3-expansion">
+                  <div class="card-header" id="step-3-3-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-3-3-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-3-3-collapse"
+                      >
+                        零件类型
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-3-3-collapse"
+                    class="collapse"
+                    aria-labelledby="step-3-3-heading"
+                    data-parent="#step-3-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <div class="checkbox" style="margin-top: 4px; margin-left: 4px">
+                        <div class="btn-group">
+                          <button
+                            class="btn dropdown-toggle btn-outline-dark"
+                            type="button"
+                            id="bricklink-piece-button"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                          >
+                            砖块像素块
+                          </button>
+                          <div
+                            class="dropdown-menu"
+                            id="bricklink-piece-options"
+                            aria-labelledby="stud-map-button"
+                          ></div>
+                        </div>
+                        <div id="pixel-dimensions-container-wrapper" hidden style="margin-top: 8px; margin-bottom: 2px">
+                          <small>
+                            <p style="margin-bottom: 8px">
+                              <b>重要</b>：由于选择了可变大小的像素类型，<span style="font-weight: 550">“无限件计数”</span>在下面<span style="font-weight: 550">“可用颜色”</span>已启用-小心！
+                            </p>
+                          </small>
+                          <b>可用尺寸：</b>
+                          <div id="pixel-dimensions-container"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card accordion-card hide-on-step-3-expansion">
+                  <div class="card-header" id="step-3-4-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-3-4-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-3-4-collapse"
+                      >
+                        量化算法
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-3-4-collapse"
+                    class="collapse"
+                    aria-labelledby="step-3-4-heading"
+                    data-parent="#step-3-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <div style="margin-left: 4px">
+                        <small>
+                          <b style="margin-bottom: 2px">颜色距离函数 </b>
+                          <p style="margin-bottom: 8px; margin-top: 4px">
+                            &#9679; 此设置确定使用的颜色距离函数将像素与其最接近的选中色系对齐。
+                          </p>
+                        </small>
+                        <button
+                          class="btn dropdown-toggle btn-outline-dark"
+                          type="button"
+                          id="distance-function-button"
+                          data-toggle="dropdown"
+                        >
+                          Euclidean RGB
+                        </button>
+                        <div class="dropdown-menu" id="distance-function-options"></div>
+                      </div>
+                      <div style="margin-top: 12px; margin-left: 4px">
+                        <small>
+                          <b style="margin-bottom: 2px">量化算法</b>
+                          <p style="margin-bottom: 8px; margin-top: 4px">
+                            &#9679; 这将确定用于对齐像素的策略。
+                          </p>
+                          <p style="margin-bottom: 8px; margin-top: 4px">
+                            &#9679; 有些算法运行得比其他算法快-在较大的图像上运行算法时要注意。
+                          </p>
+                        </small>
+                        <button
+                          class="btn dropdown-toggle btn-outline-dark"
+                          type="button"
+                          id="quantization-algorithm-button"
+                          data-toggle="dropdown"
+                        >
+                          2 相
+                        </button>
+                        <div class="dropdown-menu" id="quantization-algorithm-options"></div>
+                      </div>
+                      <div
+                        style="margin-top: 4px; margin-left: 4px"
+                        class="traditional-dithering-algorithm-warning"
+                        hidden
+                      >
+                        <small>
+                          <p style="margin-bottom: 8px">
+                            <b>重要</b>：请注意使用此算法，会开启
+                            <span style="font-weight: 550">“颜色的数量无限”</span>。
+                          </p>
+                        </small>
+                      </div>
+                      <div style="margin-left: 4px" class="traditional-dithering-algorithm-warning" hidden>
+                        <small>
+                          <p>
+                            通常最好使用
+                            <span style="font-weight: 550">'Euclidean RGB'</span>
+                            对于颜色距离函数，用于数学清洁度。
+                          </p>
+                        </small>
+                      </div>
+                      <div style="margin-top: 12px; margin-left: 4px" id="color-ties-resolution-section">
+                        <small>
+                          <b style="margin-bottom: 2px">彩色分辨率策略。</b>
+                          <p style="margin-bottom: 4px">
+                           如果设置了较大的分辨率，但没有足够的积木数量在步骤4中均匀填充，则更改此选项会很有用。
+                          </p>
+                        </small>
+                        <div class="btn-group">
+                          <button
+                            class="btn dropdown-toggle btn-outline-dark"
+                            type="button"
+                            id="color-ties-resolution-button"
+                            data-toggle="dropdown"
+                          >
+                            策略：交替模式
+                          </button>
+                          <div class="dropdown-menu" id="color-ties-resolution-options"></div>
+                        </div>
+                        <div style="padding-top: 4px; padding-right: 12px; width: 100%">
+                          <div>
+                            阻塞因子：
+                            <span id="color-tie-grouping-factor-text">1</span>
+                          </div>
+                          <input
+                            type="range"
+                            id="color-tie-grouping-factor-slider"
+                            name="color-tie-grouping-factor-slider"
+                            min="1"
+                            max="5"
+                            step="1"
+                            value="1"
+                            style="width: 100%"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="tab-pane fade"
+              id="step-3-depth-tab-content"
+              role="tabpanel"
+              aria-labelledby="step-3-depth-tab-content"
+            >
+              <canvas id="step-3-depth-canvas" hidden></canvas>
+              <canvas id="step-3-depth-canvas-upscaled" style="width: 100%"></canvas>
+              <h4>步骤 3</h4>
+              <small className="step-header-subtitle">调整深度图</small>
+              <div id="step-3-depth-accordion">
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-3-depth-1-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-3-depth-1-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-3-depth-1-collapse"
+                      >
+                        编辑深度
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-3-depth-1-collapse"
+                    class="collapse"
+                    aria-labelledby="step-3-depth-1-heading"
+                    data-parent="#step-3-depth-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <div style="margin-left: 4px; margin-top: 8px">
+                        <button class="btn btn-warning" type="button" id="clear-depth-overrides-button">
+                          清除覆盖
+                        </button>
+                      </div>
+                      <small>
+                        <p style="margin-top: 4px; margin-left: 4px; margin-bottom: 4px">
+                          &#9679; 单击像素以增加其高度
+                        </p>
+                        <p style="margin-top: 4px; margin-left: 4px; margin-bottom: 4px">
+                          &#9679; 单击像素以降低其高度
+                        </p>
+                      </small>
+
+                      <button
+                        style="margin-top: 8px; margin-left: 4px"
+                        class="btn btn-info"
+                        type="button"
+                        id="toggle-depth-expansion-button"
+                      >
+                        展开图片
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="step-4" class="col-md-3 hide-on-step-3-expansion">
+        <div class="card" style="padding: 10px; margin-bottom: 10px">
+          <ul class="nav nav-tabs 3d-selector-tabs" role="tablist" hidden>
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                id="step-4-color-tab"
+                data-toggle="tab"
+                href="#step-4-color-tab-content"
+                role="tab"
+                aria-controls="step-4-color-tab-content"
+                aria-selected="true"
+                >颜色</a
+              >
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                id="step-4-depth-tab"
+                data-toggle="tab"
+                href="#step-4-depth-tab-content"
+                role="tab"
+                aria-controls="step-4-depth-tab-content"
+                aria-selected="true"
+                >深度</a
+              >
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div
+              class="tab-pane fade show active"
+              id="step-4-color-tab-content"
+              role="tabpanel"
+              aria-labelledby="step-4-color-tab"
+            >
+              <canvas id="step-4-canvas" hidden></canvas>
+              <canvas id="bricklink-cache-canvas" hidden></canvas>
+              <canvas id="step-4-canvas-upscaled" style="width: 100%"></canvas>
+              <h4>步骤 4</h4>
+              <small className="step-header-subtitle">如果工件数量有限，则对可用工件进行校正。</small>
+              <br />
+              <div className="step-header-subtitle text-danger" id="nonzero-missing-pieces-warning" hidden>
+                <small>“可用颜色”下的“缺失数量”必须为0</small>
+              </div>
+              <span
+                data-toggle="tooltip"
+                title="This is the average per pixel quantization error. The lower this value is, the closer this image is to the image in step 2 (according to the chosen color distance function). If this is significantly higher than the quantization error from step 3, see 'Pieces Missing From Step 3' under 'Pieces Used' to determine which additional pieces can be used to improve the image."
+                data-placement="top"
+              >
+                <small>平均值</small> &#x3F5;:
+                <small id="step-4-quantization-error"></small>
+              </span>
+              <div id="step-4-accordion">
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-4-1-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-4-1-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-4-1-collapse"
+                      >
+                        零件清单
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-4-1-collapse"
+                    class="collapse"
+                    aria-labelledby="step-4-1-heading"
+                    data-parent="#step-4-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <div style="margin-left: 4px; margin-bottom: 2px; margin-top: 8px">
+                        <b>最终图像中使用的数量</b>
+						<p style="font-size: 12px; ">如果要删除数量少的颜色，到步骤3的“图片所用到颜色”里面删除（点红叉）</p>
+                      </div>
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th scope="col">颜色</th>
+                            <th scope="col" id="pieces-used-dimensions-header" hidden>尺寸</th>
+                            <th scope="col">使用的数量</th>
+                          </tr>
+                        </thead>
+                        <tbody id="studs-used-table-body"></tbody>
+                      </table>
+                      <div id="studs-missing-container" hidden>
+                        <div style="margin-left: 4px; margin-bottom: 2px; margin-top: 8px">
+                          <b>步骤3中缺少的部分</b>
+                        </div>
+                        <div style="margin-left: 4px; margin-bottom: 2px; margin-top: 8px">
+                          <small
+                            >增加以下颜色，将允许步骤4中的图像与步骤3中的图像一致
+                          </small>
+                        </div>
+                        <table class="table">
+                          <thead>
+                            <tr>
+                              <th scope="col">颜色</th>
+                              <th scope="col">缺失的数量</th>
+                            </tr>
+                          </thead>
+                          <tbody id="studs-missing-table-body"></tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card accordion-card" id="bricklink-export-card">
+                  <div class="card-header" id="step-4-2-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-4-2-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-4-2-collapse"
+                      >
+                        导出列表
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-4-2-collapse"
+                    class="collapse"
+                    aria-labelledby="step-4-2-heading"
+                    data-parent="#step-4-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <button
+                        type="button"
+                        id="export-to-bricklink-button"
+                        class="btn btn-info"
+                        style="margin-bottom: 10px; margin-top: 8px"
+                      >
+                        将Bricklink XML复制到剪贴板
+                      </button>
+                      <br />
+                      <small>
+                        <p style="margin-left: 4px; margin-bottom: 4px">
+                          使用的块类型取决于步骤3中的“零件类型”。
+                        </p>
+                        <p style="margin-left: 4px; margin-bottom: 4px">不包含框架的零件。</p>
+                      </small>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-4-3-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-4-3-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-4-3-collapse"
+                      >
+                        PDF说明书
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-4-3-collapse"
+                    class="collapse"
+                    aria-labelledby="step-4-3-heading"
+                    data-parent="#step-4-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <div class="progress" style="height: 37px" id="pdf-progress-container" hidden>
+                        <div
+                          class="progress-bar"
+                          id="pdf-progress-bar"
+                          role="progressbar"
+                          style="background-color: #17a2b8; transition: none"
+                        ></div>
+                      </div>
+                      <div id="instructions-canvas-container" hidden></div>
+                      <button
+                        type="button"
+                        id="download-instructions-button"
+                        class="btn btn-info"
+                        style="margin-top: 8px"
+                      >
+                        生成PDF说明书
+                      </button>
+                      <div class="checkbox" style="margin-top: 4px; margin-left: 4px">
+                        <label class="checkbox-clickable">
+                          <input type="checkbox" class="checkbox-clickable" id="high-quality-instructions-check" />
+                          <span style="font-size: 13px">高质量pdf</span>
+                        </label>
+                      </div>
+					  <p><b style="color: #ff4c00;font-size:16px;">大尺寸像素点+高质量PDF，会很耗时间，要耐心等待！</b></p>
+                      <small>
+						<p style="margin-left: 4px; margin-bottom: 4px">确定没有问题再生成高质量PDF文件，打印图纸需要用高质量。</p>
+                        <p style="margin-left: 4px; margin-bottom: 4px">过多的像素点，说明书会自动拆分为多个文件，请逐一保存。</p>
+                        <p style="margin-left: 4px; margin-bottom: 4px">步骤图里面的颜色名称是砖的颜色。</p>
+                      </small>
+                      <div style="margin-left: 4px; margin-bottom: 4px">
+                        <small>
+                          <b style="color: #ff4c00">重要提示</b>
+                          <p>根据您选择的分辨率，生成pdf可能需要几秒甚至几分钟。如果要生成更大分辨率的图片，尤其是高质量的PDF，请耐心等待。</br>更大的分辨率也可能会导致页面速度变慢，或者无法生成，因此我们建议从默认值开始，然后再提高。</p>
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div
+              class="tab-pane fade show"
+              id="step-4-depth-tab-content"
+              role="tabpanel"
+              aria-labelledby="step-4-depth-tab"
+            >
+              <div id="step-4-canvas-3d-upscaled" style="width: 100%"></div>
+              <h4 style="margin-top: 4px; padding-bottom: 4px">3D预览</h4>
+              <small className="step-header-subtitle"
+                >如果将鼠标悬停在图像上时看不到3D效果，请检查深度步骤1的输入。</small
+              >
+              <div id="step-4-depth-accordion">
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-4-depth-1-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-4-depth-1-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-4-depth-1-collapse"
+                      >
+                        提示
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-4-depth-1-collapse"
+                    class="collapse"
+                    aria-labelledby="step-4-depth-1-heading"
+                    data-parent="#step-4-depth-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <div style="width: 100%">
+                        <div>
+                          <small id="height-text"><b>预览效果强度</b></small>
+                        </div>
+                        <input
+                          type="range"
+                          id="3d-effect-intensity"
+                          name="points"
+                          min="0.015"
+                          max="0.03"
+                          step="0.005"
+                          value="0.01"
+                          style="width: 100%"
+                        />
+                      </div>
+                      <small>
+                        <p style="margin-left: 4px; margin-bottom: 8px">
+                          &#9679; 这是一个（非常）粗略的3D效果预览。
+                        </p>
+                        <p style="margin-left: 4px; margin-bottom: 8px">
+                          &#9679; 将鼠标悬停在图像上以改变透视。
+                        </p>
+                        <p style="margin-left: 4px; margin-bottom: 8px">
+                          &#9679; 确保深度图不是空的。
+                        </p>
+                        <p style="margin-left: 4px; margin-bottom: 8px">
+                          &#9679; 此功能需要消耗较多的本地计算机资源，因此浏览器可能会假死。
+                        </p>
+                        <p style="margin-left: 4px; margin-bottom: 8px">
+                          &#9679; 请记住，效果因浏览器而异，可能很微妙，可能无法100%代表实物艺术品的外观。
+                        </p>
+                      </small>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-4-depth-4-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-4-depth-4-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-4-depth-4-collapse"
+                      >
+                        深度板
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-4-depth-4-collapse"
+                    class="collapse"
+                    aria-labelledby="step-4-depth-4-heading"
+                    data-parent="#step-4-depth-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <small>
+                        <p style="margin-left: 4px; margin-bottom: 4px">
+                          &#9679; 这是一组板，可用于生成深度说明和工件清单。
+                        </p>
+                        <p style="margin-left: 4px; margin-bottom: 4px">
+                          &#9679; 这些块用作填充，以便正确的像素向外突出。
+                        </p>
+                        <p style="margin-left: 4px; margin-bottom: 4px">
+                          &#9679; 请注意，较大的板可能难以与底座连接/分离。
+                        </p>
+                        <b style="margin-left: 4px; margin-bottom: 2px">可用板：</b>
+                      </small>
+                      <div id="depth-plates-container"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-4-depth-2-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-4-depth-2-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-4-depth-2-collapse"
+                      >
+                        说明书
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-4-depth-2-collapse"
+                    class="collapse"
+                    aria-labelledby="step-4-depth-2-heading"
+                    data-parent="#step-4-depth-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <div class="progress" style="height: 37px" id="depth-pdf-progress-container" hidden>
+                        <div
+                          class="progress-bar"
+                          id="depth-pdf-progress-bar"
+                          role="progressbar"
+                          style="background-color: #17a2b8; transition: none"
+                        ></div>
+                      </div>
+                      <button
+                        type="button"
+                        id="download-depth-instructions-button"
+                        class="btn btn-info"
+                        style="margin-top: 8px"
+                      >
+                        生成深度说明PDF
+                      </button>
+                      <div id="depth-instructions-canvas-container" hidden></div>
+                      <div class="checkbox" style="margin-top: 4px; margin-left: 4px">
+                        <label class="checkbox-clickable">
+                          <input
+                            type="checkbox"
+                            class="checkbox-clickable"
+                            id="high-quality-depth-instructions-check"
+                          />
+                          <span style="font-size: 13px">高质量pdf</span>
+                        </label>
+                      </div>
+                      <small>
+                        <p style="margin-left: 4px; margin-bottom: 4px">
+                          较长的指令可以拆分为多个文件。
+                        </p>
+                      </small>
+                      <div style="margin-left: 4px; margin-bottom: 4px">
+                        <small>
+                          <b style="color: #ff4c00">重要提示</b>
+                          <p>
+                            根据您选择的分辨率，生成pdf可能需要几秒甚至几秒钟。如果要生成更大分辨率的图片，尤其是高质量的PDF，请耐心等待。更大的分辨率也可能会导致页面速度变慢，或者无法生成，因此我们建议从默认值开始，然后再提高。
+                          </p>
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card accordion-card">
+                  <div class="card-header" id="step-4-depth-3-heading">
+                    <h5 class="mb-0">
+                      <button
+                        class="btn btn-link collapsed"
+                        data-toggle="collapse"
+                        data-target="#step-4-depth-3-collapse"
+                        aria-expanded="false"
+                        aria-controls="step-4-depth-3-collapse"
+                      >
+                        使用的部件
+                      </button>
+                    </h5>
+                  </div>
+                  <div
+                    id="step-4-depth-3-collapse"
+                    class="collapse"
+                    aria-labelledby="step-4-depth-3-heading"
+                    data-parent="#step-4-depth-accordion"
+                  >
+                    <div class="card-body accordion-card-body">
+                      <button
+                        type="button"
+                        id="export-depth-to-bricklink-button"
+                        class="btn btn-info"
+                        disabled
+                        style="margin-bottom: 10px; margin-top: 8px"
+                      >
+                        将Bricklink XML复制到剪贴板
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="image-input-card" class="card card-body" style="padding-bottom: 10px">
+      <div class="row">
+        <div class="col-sm">
+          <span class="btn-group" style="margin-top: 8px">
+            <div class="row" style="margin-left: 0px">
+              <div style="margin-right: 4px">
+                <span style="margin-left: 4px; margin-right: 8px; margin-top: 4px; font-weight: 600">选择色表:</span>
+                <span
+                  data-toggle="tooltip"
+                  title="This can also be changed or adjusted piece by piece later"
+                  data-placement="top"
+                >
+                  <button
+                    class="btn dropdown-toggle btn-outline-dark btn-sm"
+                    type="button"
+                    id="select-starting-custom-stud-map-button"
+                    data-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                    disabled
+                  >
+                    选择色表
+                  </button>
+                  <div
+                    class="dropdown-menu"
+                    id="select-starting-custom-stud-map-options"
+                    aria-labelledby="select-starting-custom-stud-map-button"
+                  ></div>
+                </span>
+              </div>
+              <div style="margin-left: 2px">
+                <small style="margin-top: 10px" class="text-muted" id="input-stud-map-description"></small>
+              </div>
+            </div>
+          </span>
+          <canvas id="input-canvas" hidden></canvas>
+          <canvas id="input-depth-canvas" hidden></canvas>
+          <span id="image-input">
+            <input type="file" id="input-image-selector-hidden" name="input-image-selector-hidden" hidden />
+            <div style="margin-top: 12px">
+              <button class="btn btn-success" type="button" id="input-image-selector" disabled>
+                选择本机图片
+              </button>
+            </div>
+          </span>
+          <small hidden
+            ><a
+              target="_blank"
+              id="hogwarts-crest-example-instructions-link"
+              href="assets/pdf/lego-art-remix-discount-hogwarts-crest-instructions.pdf"
+            >
+              Example use case</a
+            >
+            - this is a full Hogwarts crest created by the algorithm with just 1 copy of
+            <a
+              target="_blank"
+              id="31201-lego-website-link"
+              href="https://www.lego.com/en-us/product/harry-potter-hogwarts-crests-31201"
+              >set 31201</a
+            ></small
+          >
+          <span id="run-example-input-container" hidden>
+            <span style="margin-left: 8px; margin-right: 8px; font-weight: 600">Or</span>
+            <button class="btn btn-success" type="button" id="run-example-input" disabled>See an Example</button>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-body" style="padding-bottom: 10px; margin-top: 10px">
+      <div class="row">
+        <div class="col-sm">
+          <h5>
+            <a
+              data-toggle="collapse"
+              href="#articles"
+              aria-expanded="false"
+              aria-controls="articles"
+              id="toggle-tech-talk-button"
+            >
+              功能简介【第一次使用请看我】
+            </a>
+          </h5>
+          <div class="collapse" id="articles">
+            <h6>
+				<br>
+				<a href="shiyongjiaocheng.html" target="_blank">点我查看程序使用教程。</a><br><br>
+				程序允许上传本地计算机的图片，通过指定的算法计算积木颜色和数量，创建积木艺术画。<br><br>
+				并且可以在线生成PDF步骤图（可打印A4），PDF文件生成后，会弹出下载窗口，请立即下载保存文件。<br><br>
+				如果手机和平板不能保存PDF文件，请使用手提电脑或台式机浏览本站。<br><br>
+				你可以根据程序生成的艺术画拼砌步骤图把零散积木颗粒拼砌成积木画实物。<br><br>
+				使用的底板是16*16点专用板，零件编号65803。<br><br>
+				<p style="color:#ff0000">
+				注意：服务器并没有存储上传和生成的数据，因此请保存好PDF文件。刷新界面后一切会从新开始。<br>
+				</p>
+			</h6>
+            <p style="margin-bottom: 4px; font-weight: 600">&nbsp;</p><small>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card card-body" style="padding-bottom: 10px; margin-top: 10px">
+      <div class="row">
+        <div class="col-sm">
+          <h5>
+            <a data-toggle="collapse" href="#about" aria-expanded="false" aria-controls="about"> 关于 </a>
+          </h5>
+          <div class="collapse" id="about">
+            <div style="margin-bottom: 15px"> <small> <span id="version-number"></span> • <span>Made with ♥ by Deb</span> <span>【Modify with ♥ by 奇果妈妈】</span><span id="total-generated-count"></span> </small> </div>
+			<div>
+				<h6>步骤拼砌图生成了，不知道去哪里购买配件?</h6>
+				<p style="margin-bottom: 5px">全电商平台的乐高色号的积木都可以匹配，请使用乐高正品，国内代替品跟正品会有色差。</p>
+			</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card card-body" style="padding-bottom: 10px; margin-top: 10px" id="metrics-card" hidden>
+      <div class="row">
+        <div class="col-sm">
+          <h5>
+            <a data-toggle="collapse" href="#metrics" aria-expanded="false" aria-controls="metrics"> 使用度量</a>
+          </h5>
+          <div class="collapse" id="metrics">
+            <small>
+              <p style="margin-bottom: 4px">
+                注意：没有存储用户数据，因此这只是基于简单增量的聚合信息。
+              </p>
+            </small>
+            <div>
+              <table id="input-image-count-table">
+                <tr>
+                  <th>日期</th>
+                  <th>创建的图像</th>
+                </tr>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <script>
+      // add background generation code inline so it loads in before other logic
+      function rgbToHex(r, g, b) {
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+      }
+
+      function handleDarkModeChange() {
+        const isDarkModeEnabled = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        Array.from(document.getElementsByClassName("dark-mode-stylesheet")).forEach((stylesheet) => {
+          stylesheet.disabled = !isDarkModeEnabled;
+        });
+
+        const canvas = document.getElementById("background-image-cache-canvas");
+        const ctx = canvas.getContext("2d");
+
+        const CIRCLE_RADIUS = 10;
+        const WIDTH_COUNT = 40;
+        const HEIGHT_COUNT = 20;
+        const MIN_CIRCLE_BRIGHTNESS = 245;
+
+        canvas.width = CIRCLE_RADIUS * WIDTH_COUNT;
+        canvas.height = CIRCLE_RADIUS * HEIGHT_COUNT;
+
+        for (let i = 0; i < HEIGHT_COUNT; i++) {
+          for (let j = 0; j < WIDTH_COUNT; j++) {
+            ctx.beginPath();
+            ctx.arc(
+              CIRCLE_RADIUS + 2 * i * CIRCLE_RADIUS,
+              CIRCLE_RADIUS + 2 * j * CIRCLE_RADIUS,
+              CIRCLE_RADIUS,
+              0,
+              2 * Math.PI
+            );
+            let brightness = MIN_CIRCLE_BRIGHTNESS + Math.floor(Math.random() * (255 - MIN_CIRCLE_BRIGHTNESS));
+            if (isDarkModeEnabled) {
+              brightness = 255 - brightness;
+            }
+            ctx.fillStyle = rgbToHex(brightness, brightness, brightness);
+            ctx.fill();
+          }
+        }
+
+        const dataURL = canvas.toDataURL("image/png", 1.0);
+
+        document.body.style.backgroundImage = `url('${dataURL}')`;
+      }
+
+      handleDarkModeChange();
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", handleDarkModeChange);
+    </script>
+
+    <!-- Add firebase to log performance -->
+    <script src="/js2/firebase-app.js"></script>
+    <script src="/js2/firebase-database.js"></script>
+    <script>
+      firebase.initializeApp({
+        apiKey: "AIzaSyDZpG-5SrDxpwV9kmbwNiiKXJhg-qaH1d8",
+        authDomain: "lego-art-remix-stats.firebaseapp.com",
+        databaseURL: "https://lego-art-remix-stats.firebaseio.com",
+        projectId: "lego-art-remix-stats",
+        storageBucket: "lego-art-remix-stats.appspot.com",
+        messagingSenderId: "622482243553",
+        appId: "1:622482243553:web:3ef8ee3f3796190528dca0",
+      });
+    </script>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script
+      src="./js2/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="./js2/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="./js2/bootstrap.min.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <script
+      src="./js2/jspdf.debug.js"
+      integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/"
+      crossorigin="anonymous"
+    ></script>
+    <script src="./js2/d3.v5.js"></script>
+    <script src="./js2/d3-color-difference.js"></script>
+    <script
+      src="./js2/cropper.min.js"
+      integrity="sha512-IlZV3863HqEgMeFLVllRjbNOoh8uVj0kgx0aYxgt4rdBABTZCl/h5MfshHD9BrnVs6Rs9yNN7kUQpzhcLkNmHw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="js/pixi.min.js"></script>
+    <script src="js/bricklink-colors.js"></script>
+    <script src="js/stud-maps.js"></script>
+    <script src="js/heap.js"></script>
+    <script src="js/algo.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/metrics.js"></script>
+
+    <script>
+      // note that the disableServiceWorker param only disables new service worker registration
+      if ("serviceWorker" in navigator && !window.location.href.match(/disableServiceWorker/gi)) {
+        navigator.serviceWorker
+          .register("service-worker.js")
+          .then(function (registration) {
+            console.log("Service worker registration successful, scope is:", registration.scope);
+          })
+          .catch(function (error) {
+            console.error("Service worker registration failed, error:", error);
+          });
+      }
+    </script>
+    <footer>
+      <small class="footer">
+        <p style="margin-top:10px">为获得本站最佳体验效果，请使用1920*1080显示器分辨率。</p>
+        <p style="margin:10px 0;">本项目只使用了乐高标准化，并不隶属于乐高集团。</p>
+      </small>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="./css/bootstrap.min.css"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="./css/cropper.min.css"
+      integrity="sha512-6QxSiaKfNSQmmqwqpTNyhHErr+Bbm8u8HHSiinMEz0uimy9nu7lc/2NaXJiUJj2y4BApd5vgDjSHyLzC8nP6Ng=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <title>万砖积木-艺术画程序【一个在线乐高像素画生成器网站】</title>
+    <meta name="description" content="一个可以使用乐高颗粒色号或者万砖积木色号的在线乐高像素画生成器网站，任何图片均可做艺术画。" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#FCE4EC" />
+	<script src="./js/tongji.js"></script>
+
+    <style>
+      a {
+        text-decoration: none !important;
+      }
+
+      #responsive-youtube {
+        overflow: hidden;
+        padding-bottom: 56.25%;
+        position: relative;
+        height: 0;
+        font-size: 24px;
+      }
+
+      #responsive-youtube iframe {
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+      }
+
+      .btn-link {
+        text-decoration: none !important;
+        width: 100%;
+        border-width: 0;
+      }
+
+      .paintbrush-controls-button {
+        background-color: #f6f6f6;
+        border: 1px solid rgba(0, 0, 0, 0.125);
+        height: 100%;
+        margin-right: 4px;
+      }
+
+      .paintbrush-controls-button:hover:enabled {
+        background-color: #6c6c6c;
+      }
+
+      #step-3-canvas-upscaled {
+        /* cursor: crosshair; TODO: Better cursor*/
+      }
+
+      .card {
+        background-color: rgba(255, 255, 255, 0.6);
+      }
+
+      .card-header {
+        padding: 0;
+        border: 0;
+      }
+
+      .accordion-card {
+        margin-bottom: 4px;
+      }
+
+      .accordion-card-body {
+        padding: 4px;
+      }
+
+      h4 {
+        line-height: 20px;
+        margin-bottom: 0;
+      }
+
+      step-header-subtitle {
+        margin-left: 2px;
+      }
+
+      #nonzero-missing-pieces-warning {
+        color: #dc3545;
+      }
+
+      .checkbox-clickable {
+        cursor: pointer;
+      }
+
+      table {
+        border-top: 1px solid rgb(222, 226, 230);
+        border-left: 1px solid rgb(222, 226, 230);
+        border-bottom: 0;
+        border-right: 0;
+      }
+
+      td,
+      th {
+        border-top: 0;
+        border-left: 0;
+        border-bottom: 1px solid rgb(222, 226, 230);
+        border-right: 1px solid rgb(222, 226, 230);
+      }
+
+      .piece-count-infinity-placeholder {
+        padding-left: 2px;
+        padding-right: 2px;
+        font-weight: 600;
+        font-size: 18px;
+      }
+
+      .cropper-img {
+        display: block;
+
+        max-width: 100%;
+      }
+
+      .progress-bar.indeterminate {
+        position: relative;
+        animation: progress-indeterminate 3s linear infinite;
+      }
+
+      @keyframes progress-indeterminate {
+        from {
+          left: -50%;
+          width: 50%;
+        }
+
+        to {
+          left: 100%;
+          width: 50%;
+        }
+      }
+
+      footer {
+        bottom: 0;
+        width: 100%;
+      }
+
+      .footer {
+        height: 50px;
+        text-align: center;
+      }
+    </style>
+
+    <style class="dark-mode-stylesheet" disabled>
+      html,
+      body {
+        background-color: black;
+      }
+
+      html,
+      body,
+      .table,
+      .btn-outline-dark {
+        color: #d3d3d3;
+      }
+
+      .btn {
+        color: #ffffff;
+      }
+
+      .paintbrush-controls-button {
+        background-color: #1c1c1c;
+      }
+
+      .btn-warning,
+      .dropdown-item {
+        color: #212529;
+      }
+
+      .card {
+        background-color: rgb(33, 33, 33, 0.6);
+      }
+
+      .nav-tabs .nav-item.show .nav-link,
+      .nav-tabs .nav-link.active {
+        background-color: rgb(33, 33, 33, 0.6);
+        border-color: rgb(50, 50, 50);
+      }
+
+      .nav-tabs {
+        border-bottom: 0;
+      }
+
+      table {
+        border-top: 1px solid rgb(50, 50, 50);
+        border-left: 1px solid rgb(50, 50, 50);
+      }
+
+      td,
+      th {
+        border-bottom: 1px solid rgb(50, 50, 50);
+        border-right: 1px solid rgb(50, 50, 50);
+      }
+
+      .table thead th {
+        border-bottom: 1px solid rgb(50, 50, 50);
+        border-top: 1px solid rgb(50, 50, 50);
+      }
+    </style>
+    <style>
+	.all{text-align:center;font-size:30px;width:100%;min-height:220px;overflow:hidden;}
+	.v1{width:50%;float:left;padding:15% 0 12% 10%;}
+	.v2{width:50%;float:left;padding:15% 10% 12% 0}
+    </style>
+  </head>
+
+  <body>
+    <div style="margin: 10px; padding-bottom: 30px; overflow: hidden; min-height: calc(80vh - 60px)">
+      <h2 style="margin-bottom: 0; margin-left: 4px">万砖积木-艺术画程序</h2>
+      <div style="margin-bottom: 10px; margin-left: 6px">
+        <small>软件按照设定的色表自动把图片转换成像素画，并生成PDF步骤图和提供文件下载。</small>
+        <div style="margin-bottom: 5px">
+          <small>
+            本网站提供“乐高”和“万砖”两种颗粒的色号选择，请点击下方不同的色号去生成艺术画。
+          </small>
+        </div>
+      </div>
+      <canvas id="background-image-cache-canvas" hidden></canvas>
+		<div class="all">
+			<div class="v1">
+				<a href="/lego/pc.html">乐高色号</a >
+			</div>
+			<div class="v2">
+				<a href="/wanzhuan/">万砖色号</a>
+			</div>
+		</div>
+    <div class="card card-body" style="padding-bottom: 10px; margin-top: 10px">
+      <div class="row">
+        <div class="col-sm">
+          <h5>
+            <a
+              data-toggle="collapse"
+              href="#articles"
+              aria-expanded="false"
+              aria-controls="articles"
+              id="toggle-tech-talk-button"
+            >
+              功能简介【第一次使用请看我】
+            </a>
+          </h5>
+          <div class="collapse" id="articles">
+            <h6>
+				<br>
+				程序允许上传本地计算机的图片，通过指定的算法计算积木颜色和数量，创建积木像素画。<br><br>
+				并且可以生成PDF步骤图，PDF文件是在客户端生成，然后提供下载，不保存在服务器。<br><br>
+				系统生成积木画的拼砌步骤图，你可以根据步骤把图片拼砌成积木画实物。<br><br>
+				使用的底板是16*16点带孔板，零件编号65803。<br><br>
+				<p style="color:#ff0000">
+				注意：程序并没有存储上传和生成的数据，因此请保存好PDF文件。<br><br>
+				</p>
+				
+			</h6>
+            <p style="margin-bottom: 4px; font-weight: 600">&nbsp;</p><small>
+            </small>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card card-body" style="padding-bottom: 10px; margin-top: 10px">
+      <div class="row">
+        <div class="col-sm">
+          <h5>
+            <a data-toggle="collapse" href="#about" aria-expanded="false" aria-controls="about"> 关于 </a>
+          </h5>
+          <div class="collapse" id="about">
+            <div style="margin-bottom: 15px"> <small> <span id="version-number"></span> • <span>Made with ♥ by Deb</span> <span>【Modify with ♥ by 奇果妈妈】</span><span id="total-generated-count"></span> </small> </div>
+            <h6>本程序面向WEB端所有用户，且免费使用。</h6>
+            <h6>生成的图纸所需的零件请到互联网自行购买，本程序不提供零件。</h6>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <script>
+      // add background generation code inline so it loads in before other logic
+      function rgbToHex(r, g, b) {
+        return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+      }
+
+      function handleDarkModeChange() {
+        const isDarkModeEnabled = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+        Array.from(document.getElementsByClassName("dark-mode-stylesheet")).forEach((stylesheet) => {
+          stylesheet.disabled = !isDarkModeEnabled;
+        });
+
+        const canvas = document.getElementById("background-image-cache-canvas");
+        const ctx = canvas.getContext("2d");
+
+        const CIRCLE_RADIUS = 10;
+        const WIDTH_COUNT = 40;
+        const HEIGHT_COUNT = 20;
+        const MIN_CIRCLE_BRIGHTNESS = 245;
+
+        canvas.width = CIRCLE_RADIUS * WIDTH_COUNT;
+        canvas.height = CIRCLE_RADIUS * HEIGHT_COUNT;
+
+        for (let i = 0; i < HEIGHT_COUNT; i++) {
+          for (let j = 0; j < WIDTH_COUNT; j++) {
+            ctx.beginPath();
+            ctx.arc(
+              CIRCLE_RADIUS + 2 * i * CIRCLE_RADIUS,
+              CIRCLE_RADIUS + 2 * j * CIRCLE_RADIUS,
+              CIRCLE_RADIUS,
+              0,
+              2 * Math.PI
+            );
+            let brightness = MIN_CIRCLE_BRIGHTNESS + Math.floor(Math.random() * (255 - MIN_CIRCLE_BRIGHTNESS));
+            if (isDarkModeEnabled) {
+              brightness = 255 - brightness;
+            }
+            ctx.fillStyle = rgbToHex(brightness, brightness, brightness);
+            ctx.fill();
+          }
+        }
+
+        const dataURL = canvas.toDataURL("image/png", 1.0);
+
+        document.body.style.backgroundImage = `url('${dataURL}')`;
+      }
+
+      handleDarkModeChange();
+      window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", handleDarkModeChange);
+    </script>
+
+    <!-- Add firebase to log performance -->
+    <script src="./js2/firebase-app.js"></script>
+    <script src="./js2/firebase-database.js"></script>
+    <script>
+      firebase.initializeApp({
+        apiKey: "AIzaSyDZpG-5SrDxpwV9kmbwNiiKXJhg-qaH1d8",
+        authDomain: "lego-art-remix-stats.firebaseapp.com",
+        databaseURL: "https://lego-art-remix-stats.firebaseio.com",
+        projectId: "lego-art-remix-stats",
+        storageBucket: "lego-art-remix-stats.appspot.com",
+        messagingSenderId: "622482243553",
+        appId: "1:622482243553:web:3ef8ee3f3796190528dca0",
+      });
+    </script>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script
+      src="./lego/js2/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="./lego/js2/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="./lego/js2/bootstrap.min.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <script
+      src="./lego/js2/jspdf.debug.js"
+      integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/"
+      crossorigin="anonymous"
+    ></script>
+    <script src="./lego/js2/d3.v5.js"></script>
+    <script src="./lego/js2/d3-color-difference.js"></script>
+    <script
+      src="./lego/js2/cropper.min.js"
+      integrity="sha512-IlZV3863HqEgMeFLVllRjbNOoh8uVj0kgx0aYxgt4rdBABTZCl/h5MfshHD9BrnVs6Rs9yNN7kUQpzhcLkNmHw=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    ></script>
+    <script src="./lego/js/pixi.min.js"></script>
+    <script src="./lego/js/bricklink-colors.js"></script>
+    <script src="./lego/js/stud-maps.js"></script>
+    <script src="./lego/js/heap.js"></script>
+    <script src="./lego/js/algo.js"></script>
+    <script src="./lego/js/index.js"></script>
+    <script src="./lego/js/metrics.js"></script>
+
+    <script>
+      // note that the disableServiceWorker param only disables new service worker registration
+      if ("serviceWorker" in navigator && !window.location.href.match(/disableServiceWorker/gi)) {
+        navigator.serviceWorker
+          .register("service-worker.js")
+          .then(function (registration) {
+            console.log("Service worker registration successful, scope is:", registration.scope);
+          })
+          .catch(function (error) {
+            console.error("Service worker registration failed, error:", error);
+          });
+      }
+    </script>
+
+    <footer>
+	  <small class="footer">
+        <p style="margin-top:10px">为获得本站最佳体验效果，请使用1920*1080显示器分辨率。</p>
+        <p style="margin-top:10px">本项目只使用了乐高标准化，并不隶属于乐高集团。</p>
+        <p style="margin:10px 0;">Copyright © 2019-2025 万砖 • <a href="https://www.qiguomama.com/" target="_blank">奇果妈妈</a> 版权所有 <a href="https://beian.miit.gov.cn/" rel="nofollow" target="_blank">粤ICP备19044807号-2</a></p>
+      </small>
+    </footer>
+  </body>
+</html>
