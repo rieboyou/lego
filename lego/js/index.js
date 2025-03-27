@@ -380,10 +380,10 @@ document.getElementById("color-tie-grouping-factor-slider").addEventListener("ch
     ).value;
     runStep4();
 });
-
+/*預設顏色和色表*/
 let DEFAULT_STUD_MAP = "all_tile_colors";
-let DEFAULT_COLOR = "#42c0fb";
-let DEFAULT_COLOR_NAME = "Medium Azure";
+let DEFAULT_COLOR = "#96accb";//"#42c0fb";
+let DEFAULT_COLOR_NAME = "test92"; //"Medium Azure"
 
 try {
     const match = window.location.href.match("[?&]" + "availableColors" + "=([^&]+)");
